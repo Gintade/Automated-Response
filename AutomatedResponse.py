@@ -8,8 +8,12 @@ class ChatBot:
         self.password = password
 
     def openDiscord(self):
-        #search webdriver on pc
+        #search webdriver on pc and open chrome
         self.driver = webdriver.Chrome('C:\\Users\\User\\Desktop\\chromedriver.exe')
+        #browser asks me to accept certificate from the website, so i ignore
+        options = webdriver.ChromeOptions()
+        options.add_argument('--ignore-certificate-errors')
+        options.add_argument('--ignore-ssl-errors')
         #maximize window
         self.driver.maximize_window()
         #open page
@@ -58,7 +62,7 @@ class ChatBot:
 
         sleep(2)
 
-        #select user
+        #select chatbox
         chatbox = self.driver.find_element_by_xpath('//*[@id="app-mount"]/div[1]/div/div[2]/div/div/div/div/div[2]/div[2]/div/form/div/div/div/div[3]/div[2]/div')
         chatbox.click()
 
@@ -104,12 +108,15 @@ class ChatBot:
 
         sleep(3) #for avoiding ban lol
 
-        #all messages share the same class, so i access the element 0
-        message = self.driver.find_element_by_xpath("//div[contains(concat(' ', normalize-space(@class), ' '), ' markup-2BOw-j containerCozy-336-Cz markupRtl-3M0hmN ')]")
-        text1 = message.text
-        print('Mensaje recibido: ' + text1)
+        #all messages share the same class, so i get last item in the list (by using -1)
+        allmessages = self.driver.find_elements_by_xpath("//div[@class='markup-2BOw-j containerCozy-336-Cz markupRtl-3M0hmN']")
+        lastmessage = allmessages[-1].text
+        print('Mensaje recibido: ' + lastmessage)
 
-        self.openCleverBot(message.text)
+        self.openCleverBot(lastmessage)
+
+    def wait(self):
+        sleep(30)
 
     def closeWindow(self):
 
@@ -125,4 +132,6 @@ bot.openDiscord()
 bot.login()
 bot.closePopup()
 bot.searchPerson()
+#to do: put both methods below in a loop that checks for friend response
 bot.copyAnswer()
+bot.wait()
